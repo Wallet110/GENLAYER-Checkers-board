@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GENLAYER Checkers</title>
+    <style>
+        body { background: #050505; color: #00f2ff; font-family: 'Courier New', monospace; text-align: center; }
+        #board { 
+            display: grid; grid-template-columns: repeat(10, 50px); 
+            margin: 20px auto; width: 500px; border: 4px solid #333; 
+        }
+        .square { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
+        .dark { background: #111; }
+        .light { background: #222; }
+        .piece { 
+            width: 40px; height: 40px; 
+            background-image: url('./1004831759.jpg');
+            background-size: contain; background-repeat: no-repeat;
+            border-radius: 50%;
+        }
+        .red { filter: drop-shadow(0 0 8px red) hue-rotate(300deg); border: 2px solid red; }
+        .blue { filter: drop-shadow(0 0 8px #0074d9); border: 2px solid #0074d9; }
+        #leaderboard { margin-top: 20px; border: 1px solid #00f2ff; display: inline-block; padding: 10px; }
+        .badge { font-weight: bold; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <h1>GENLAYER TOURNAMENT</h1>
+    <div id="auth">
+        <input type="text" id="username" placeholder="Username">
+        <button onclick="init('user')">Join</button>
+        <button onclick="init('guest')">Play as Guest</button>
+    </div>
+
+    <div id="game" style="display:none;">
+        <div id="board"></div>
+        <div id="leaderboard">
+            <h3>Top 10 Rankings</h3>
+            <div id="list"></div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        function init(type) {
+            const user = type === 'guest' ? 'Guest_'+Math.floor(Math.random()*100) : document.getElementById('username').value;
+            if(!user) return alert("Enter name");
+            document.getElementById('auth').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+            socket.emit('joinGame', user);
+            drawBoard();
+        }
+
+        function drawBoard() {
+            const b = document.getElementById('board');
+            for (let i = 0; i < 100; i++) {
+                const s = document.createElement('div');
+                s.className = `square ${(Math.floor(i/10)+i)%2==0 ? 'light':'dark'}`;
+                if(s.className.includes('dark')) {
+                    if(i < 40) s.innerHTML = '<div class="piece red"></div>';
+                    if(i >= 60) s.innerHTML = '<div class="piece blue"></div>';
+                }
+                b.appendChild(s);
+            }
+        }
+    </script>
+</body>
+</html>
